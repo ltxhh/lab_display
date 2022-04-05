@@ -48,7 +48,7 @@ export default {
             var sid = this.$route.query.sid;
             var params = { sid: sid }
             sectionvideo_get(params).then(resp => {
-                this.video = config['qiniuurl'] + resp.video
+                this.video = resp.data.video
             })
         },
         get_course() {

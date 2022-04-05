@@ -156,8 +156,13 @@
                   </div>
                 </div>
                 <div class="imgCodeBox">
-                  <input type="text" placeholder="请输入验证码" id="imgCode" v-model="img_code"/>
-                  <img :src="img_code_url" id="img" @click="new_img"/>
+                  <input
+                    type="text"
+                    placeholder="请输入验证码"
+                    id="imgCode"
+                    v-model="img_code"
+                  />
+                  <img :src="img_code_url" id="img" @click="new_img" />
                 </div>
                 <!-- <div class="form-inline verify-code-item" style="display:none;">
                                 <div class="form-group">
@@ -314,9 +319,10 @@ import {
   send_phone_code_post,
   search_data_get,
 } from "../axios_api/api";
-import { config, formatXml } from "../../config.js";
+import { config, formatXml, img_urls } from "../../config.js";
 import { base_url } from "@/components/axios_api/http.js";
-import {v4} from 'uuid'
+import { v4 } from "uuid";
+import { axios_get } from "../axios_api/http";
 export default {
   data() {
     return {
@@ -336,26 +342,26 @@ export default {
       sinaimg: "",
       // 关键词
       keyword: null,
-       uuid: v4(),
-      img_code_url:base_url + 'img_code?uuid='+ this.uuid,
-      img_code:'',
+      uuid: v4(),
+      img_code_url: base_url + 'img_code?uuid=' + this.uuid,
+      img_code: "",
     };
-
   },
 
   beforeMount() {
     this.check_login();
   },
-  mounted: function () {
-    this.sinaimg = config["staticurl"] + "sina.png";
-    this.dingimg = config["staticurl"] + "dingding.png";
-    if (this.$route.query["jwt"]) {
-      localStorage.setItem("username", this.$route.query["username"]);
-      localStorage.setItem("uid", this.$route.query["uid"]);
-      localStorage.setItem("img", this.$route.query["img"]);
-      localStorage.setItem("token", this.$route.query["jwt"]);
-    };
-  },
+  // mounted() {
+  //   this.sinaimg = img_urls["staticurl"] + "weibo.png";
+  //   this.dingimg = img_urls["staticurl"] + "dingding.png";
+  //   // this.new_img();
+  //   if (this.$route.query["jwt"]) {
+  //     localStorage.setItem("username", this.$route.query["username"]);
+  //     localStorage.setItem("uid", this.$route.query["uid"]);
+  //     localStorage.setItem("img", this.$route.query["img"]);
+  //     localStorage.setItem("token", this.$route.query["jwt"]);
+  //   };
+  // },
   methods: {
     search(data) {
       if (data == "") {
@@ -373,18 +379,17 @@ export default {
     },
 
     // 钉钉登录
-    dingding: function () {
+    dingding() {
       var appid = "dingoajf8cqgyemqarekhr";
-      var redirect_uri = config["baseurl"] + "dingding_back/";
-
+      var redirect_uri = config["baseurl"] + "/dingding_back";
       var url =
         "https://oapi.dingtalk.com/connect/qrconnect?appid=" +
         appid +
         "&response_type=code&scope=snsapi_login&state=STATE&redirect_uri=" +
         redirect_uri;
-
       window.location.href = url;
     },
+
     // 新浪微博登录
     sina: function () {
       // 组装url
@@ -477,6 +482,7 @@ export default {
       };
       register_post(data).then((resp) => {
         this.$Message(resp.message);
+        this.$router.push({ path: "/login" });
       });
     },
     sendcode: function () {
@@ -503,9 +509,9 @@ export default {
         .then((res) => {
           if (res.data.code == 200) {
             console.log("短信发送成功");
-            alert(res.data.message);
+            alert(res.msg);
           } else {
-            alert(res.data.message);
+            alert(res.msg);
           }
         })
         .catch((err) => {
@@ -518,11 +524,16 @@ export default {
     },
 
     login() {
-      var data = { username: this.username, password: this.password ,img_code:this.img_code, uuid: this.uuid};
+      var data = {
+        username: this.username,
+        password: this.password,
+        img_code: this.img_code,
+        uuid: this.uuid,
+      };
       login_post(data).then((res) => {
-        if (res.code == 200){
+        if (res.code == 200) {
           localStorage.setItem("username", res.data.username);
-        // localStorage.setItem('img',res.data.img)
+          localStorage.setItem("img", res.data.img);
           localStorage.setItem("token", res.data.refresh_token);
           localStorage.setItem("uid", res.data.uid);
           this.login_username = res.data.username;
@@ -530,16 +541,15 @@ export default {
           console.log(res);
           alert(res.message);
           this.$router.push("/");
-        }else{
-          alert(res.message)
+        } else {
+          alert(res.message);
         }
-
       });
     },
-    new_img(){
-      this.uuid = v4()
-      this.img_code_url = base_url +'img_code?uuid=' + this.uuid;
-    }
+    new_img() {
+      this.uuid = v4();
+      this.img_code_url = base_url + "img_code?uuid=" + this.uuid;
+    },
     // login(){
     //     var data = new FormData()
     //     data.append('username', this.username);
@@ -578,9 +588,17 @@ export default {
     //     })
     //   },
   },
-// mounted(){
-//     this.new_img();
-//   }
+  mounted() {
+    this.sinaimg = img_urls["staticurl"] + "weibo.png";
+    this.dingimg = img_urls["staticurl"] + "dingding.png";
+    // this.new_img();
+    if (this.$route.query["jwt"]) {
+      localStorage.setItem("username", this.$route.query["username"]);
+      localStorage.setItem("uid", this.$route.query["uid"]);
+      localStorage.setItem("img", this.$route.query["img"]);
+      localStorage.setItem("token", this.$route.query["jwt"]);
+    }
+  },
 };
 </script>
 

@@ -13,13 +13,13 @@ import privacy from '@/components/privacy'
 import testcom from '@/components/testcom'
 import user from '@/components/user'
 import user_profile from '@/components/user_profile'
-import tripalogin from '@/components/tripalogin'
+import dingding_back from '@/components/tripalogin'
 import section_show from '@/components/section_show'
 import users from '@/components/users'
 import coupon from '@/components/coupon'
 import web_shell from '@/components/web_shell'
 import search from '@/components/search'
-
+import QN from '../components/course/AdCou'
 Vue.use(Router)
 
 // 路由拦截
@@ -112,9 +112,9 @@ var routes = [
         component: index,
     },
     {
-        path: '/tripalogin',
-        name: 'tripalogin',
-        component: tripalogin,
+        path: '/dingding_back',
+        name: 'dingding_back',
+        component: dingding_back,
     },
     {
         path: '/users',
@@ -131,6 +131,11 @@ var routes = [
         name: 'search',
         component: search,
     },
+    {
+      path: '/abc',
+      name: 'abc',
+      component: QN,
+  },
 
 ]
 

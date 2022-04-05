@@ -5,23 +5,23 @@
             <div class="media userinfo-header">
                 <div class="media-left">
                     <div class="user-avatar">
-                        
+
                         <a class="avatar" href="#sign-modal" data-toggle="modal" data-sign="signin">
                             <img class="circle" src="/static/img//logo-grey.png">
                         </a>
-                        
+
                     </div>
                 </div>
                 <div class="media-body">
-                    
+
                     <span class="media-heading username">欢迎来到实验楼</span>
                     <p class="vip-remain">做实验，学编程</p>
-                    
+
                 </div>
             </div>
 
             <div class="row userinfo-data" v-if="username == ''">
-                
+
                 <hr>
                 <div class="btn-group-lr">
                 <a href="#sign-modal" type="button" class="btn btn-success col-md-5 col-xs-6 login-btn" data-toggle="modal" data-sign="signin">登录</a>
@@ -35,16 +35,16 @@
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <img :src="myimg" alt="" width="30px" height="30px">
 
-                
+
                     欢迎您：<a class="btn btn-default navbar-btn sign-in" data-sign="signin" data-toggle="modal" href='/user'>{{ username }}</a>
-                
+
             </div>
 
             <div class="userinfo-footer row">
                 <div class="col-md-6 col-xs-6 pos-left">
-                    
+
                     <a href="#sign-modal" data-toggle="modal" data-sign="signin"><span class="glyphicon glyphicon-bookmark"></span> 加入私有课</a>
-                    
+
                 </div>
                 <div class="col-md-6 col-xs-6 pos-right">
                     <a href="/contribute" target="_blank"><span class="glyphicon glyphicon-send"></span> 我要投稿</a>
@@ -111,12 +111,13 @@ export default {
             if(img == '1.jpg'){
                 this.myimg = config['vueurl'] + 'static/img/1.jpg'
             }else{
-                this.myimg = config['qiniuurl'] + img
+                // this.myimg = config['qiniuurl'] + img
+                this.myimg = img
             }
             var data = {uid:localStorage.getItem('uid')}
                 user_get(data).then(res=>{
-                    this.img = res.img
-                    this.imgsrc = config['baseurl']+'static/upload/'+res.img;
+                    // this.img = res.data.img
+                    // this.imgsrc = res.data.img
                 })
                 if(uname==null){
                     this.username = ""

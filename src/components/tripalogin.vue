@@ -17,7 +17,7 @@
                 <br><br>
                 <tr>
                   <td><div class='board_ele'>验证码：</div></td>
-                  <td><div><input type="text" v-model="code"></div></td>
+                  <td><div><input type="text" v-model="sms_code"></div></td>
                 </tr>
                 <br><br>
           </table>
@@ -50,15 +50,17 @@
 import lab_head from './common/lab_head';
 import lab_header from './common/lab_header';
 import lab_footer from './common/lab_footer';
-import {send_phone_code_post,verif_post} from './axios_api/api';
-import {config,formatXml} from '../config.js';
+import {send_phone_code_post,verif_post, verif_get} from './axios_api/api';
+// import {config,formatXml} from '../config.js';
 export default {
     data(){
         return{
             phone:'',
-            code:'',
-            jwt:'',
-            type:'',
+            sms_code:'',
+            // jwt:'',
+            // type:'',
+            unid:'',
+
         }
     },
     components: {
@@ -66,22 +68,49 @@ export default {
     lab_header,
     lab_footer,
   },
-    mounted:function(){
-        this.type=this.$route.query['type']
-        this.jwt=this.$route.query['jwt']
+     mounted(){
+      this.getUnid()
+        // this.type=this.$route.query['code']
+        // this.jwt=this.$route.query['jwt']
     },
     methods:{
+      getUnid(){
+        let code = this.$route.query.code
+        var data = {'code': code}
+        verif_get(data).then((res)=>{
+          if (res.code==200){
+            localStorage.setItem("username", res.data.username);
+              // localStorage.setItem('img',res.data.img)
+                localStorage.setItem("token", res.data.refresh_token);
+                localStorage.setItem('img',res.data.img)
+                localStorage.setItem("uid", res.data.uid);
+                this.login_username = res.data.username;
+                this.opened = false;
+                console.log(res);
+                alert(res.message);
+                this.$router.push("/");
+          }else{
+            this.unid = res.data.unid
+          }
+        })
+      },
         verif(){
-            var data = {jwt:this.jwt, phone: this.phone, code: this.code,type:this.type}
-            verif_post(data).then(res=>{         
-                localStorage.setItem('username',res.username)
-                localStorage.setItem('img',res.img)
-                localStorage.setItem('token',this.jwt)
-                localStorage.setItem('uid',res.uid)
-                this.login_username = res.username
-                this.opened = false
-                alert(res.msg)
-                this.$router.push('/')
+          // jwt:this.jwt,,type:this.type
+            var data = { phone: this.phone, sms_code: this.sms_code, 'unid': this.unid}
+            verif_post(data).then(res=>{
+                if (res.code == 200){
+                localStorage.setItem("username", res.data.username);
+              localStorage.setItem('img',res.data.img)
+                localStorage.setItem("token", res.data.refresh_token);
+                localStorage.setItem("uid", res.data.uid);
+                this.login_username = res.data.username;
+                this.opened = false;
+                console.log(res);
+                alert(res.message);
+                this.$router.push("/");
+              }else{
+                alert(res.message)
+              }
             })
 
         },
@@ -104,17 +133,17 @@ export default {
         // 3、将用户短信发送
         var data = {phone:this.phone}
         send_phone_code_post(data).then((res) => {
-          if (res.data.code == 200) {
+          if (res.code == 200) {
             console.log('短信发送成功')
-            alert(res.data.message)
+            alert(res.msg)
           } else {
-            alert(res.data.message)
+            alert('网络超时')
           }
         }).catch((err) => {
           console.log(err)
         })
       },
-        
+
     },
 }
 </script>

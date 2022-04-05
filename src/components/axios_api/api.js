@@ -1,8 +1,8 @@
 //将我们http.js中封装好的  get,post.put,delete  导过来
 
 import { axios_get, axios_post, axios_delete, axios_put } from './http.js'
-
-
+// 七牛
+export const qn_back = p => axios_get("get_qnToken", p)
 //按照格式确定方法名
 export const jwt_send_get = p => axios_post("login", p)
 
@@ -10,13 +10,15 @@ export const login_post = p => axios_post("login", p)
 
 export const register_post = p => axios_post("register", p)
 
-export const getcourses_get = p => axios_get('getcourses', p)
-
-export const getcourses1_get = p => axios_get('getcourses1', p)
+export const getcourses_get = p => axios_get('courses', p)
+// 课程类型
+export const courses_type = p => axios_get('course_type', p)
+// getcourses1
+export const getcourses1_get = p => axios_get('get_courses', p)
 
 export const get_course_info_get = p => axios_get('courseinfo', p)
-
-export const gettags_get = p => axios_get('get_tags', p)
+// 标签
+export const gettags_get = p => axios_get('tags', p)
 
 export const user_info_get = p => axios_get('user_info', p)
 
@@ -24,8 +26,8 @@ export const user_info_post = p => axios_post('user_info', p)
 
 export const send_phone_code_post = p => axios_post('sms_code', p)
 
-export const verif_post = p => axios_post("verif", p)
-
+export const verif_post = p => axios_post("dingding_back", p)
+export const verif_get = p => axios_get("dingding_back", p)
 
 //获取路径列表信息
 export const getpaths_get = p => axios_get('getpath', p)
@@ -46,10 +48,10 @@ export const is_path_follow_get = p => axios_get('ispathfollow', p)
 
 
 // 获取单个商品信息
-export const course_show_get = p => axios_get("courseinfo", p)
+export const course_show_get = p => axios_get("course_info", p)
 
 // 获取作者信息
-export const auth_info_get = p => axios_get("authinfo", p)
+export const auth_info_get = p => axios_get("user_info", p)
 // 获取作者作品总数
 export const course_count_get = p => axios_get("coursecount", p)
 // 获取用户学习状态信息
@@ -76,7 +78,7 @@ export const get_succeed_get = p => axios_get('get_alipy', p)
 export const get_uptoken = p => axios_get('uptoken', p)
 
 // 获取用户信息
-export const user_get = p => axios_get('getuser', p)
+export const user_get = p => axios_get('user_info', p)
 
 // 学习记录
 export const courserecord = p => axios_get('courserecord', p)
@@ -97,7 +99,7 @@ export const publish_comment_post = p => axios_post('publish_comment', p)
 export const drillcourse = p => axios_get('drillcourse', p)
 
 // 获取视频
-export const sectionvideo_get = p => axios_get('sectionvideo', p)
+export const sectionvideo_get = p => axios_get('get_video', p)
 
 // 获取用户(实验课程(学习的 & 关注的 & 发布的) & 实验报告 & 实验讨论)
 export const learn_get = p => axios_get('learnview', p)

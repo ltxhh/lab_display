@@ -9,8 +9,8 @@
                 <li><a href="/courses/">全部课程</a></li>
 
                 <li class="active">
-                    <a href="/courses/1">
-                        {{ course_list.name }}
+                    <a href="/courses/1" >
+                        {{ course_list.title }}
                     </a>
                 </li>
             </ol>
@@ -20,16 +20,17 @@
 
                     <div class="side-image side-image-mobile">
                         <img src="https://dn-simplecloud.shiyanlou.com/ncn1.jpg?imageView2/0/h/300">
+                        <!-- <video src=course_list.video></video> -->
                     </div>
                     <div class="content course-infobox">
                         <div class="clearfix course-infobox-header">
                             <h4 class="pull-left course-infobox-title">
 
-                                <span>{{ course_list.name }}</span>
+                                <span>{{ course_list.desc }}</span>
 
                             </h4>
                             <div class="pull-right course-infobox-follow" data-follow-url="/courses/1/follow" data-unfollow-url="/courses/1/unfollow">
-                                <span class="course-infobox-followers">{{course_list.collect_num}}</span>
+                                <span class="course-infobox-followers">{{course_list.follower}}</span>
                                 <span>人关注</span>
 
                                 <i class="fa fa-star-o" data-next="/login?next=%2Fcourses%2F1" @click="collect_click(course_list.id)"></i>
@@ -57,7 +58,7 @@
 
                         <div class="clearfix course-infobox-footer">
 
-                            <div class="pull-right course-infobox-learned">{{ course_list.collect_num }} 人学过</div>
+                            <div class="pull-right course-infobox-learned">{{ course_list.learner }} 人学过</div>
                         </div>
 
                     </div>
@@ -70,7 +71,7 @@
                             <div v-if='type_selected=="list"'>
 
                                 <div class="lab-item ">
-                                    <h4 class="lab-item-title">{{ course_list.name }}</h4>
+                                    <h4 class="lab-item-title">{{ course_list.title }}</h4>
                                 </div>
 
                                 <div class="lab-item change_curse" v-for="(item,index) in section_list" :key="index">
@@ -81,7 +82,7 @@
                                     </div>
                                     <div class="lab-item-index">第{{ index+1 }}节</div>
                                     <div class="lab-item-title" data-toggle="tooltip" data-placement="bottom" title="基本概念及操作">
-                                        <a :href="'/section_show/?sid=' + item.id + '&cid=' + course_list.id" target="_blank" rel="noopener noreferrer">{{ item.section_name }}</a></div>
+                                        <a :href="'/section_show/?sid=' + item.id + '&cid=' + course_list.id" target="_blank" rel="noopener noreferrer">{{ item.title }}</a></div>
                                     <div class="pull-right lab-item-ctrl">
                                     </div>
                                     <div class="pull-right lab-item-ctrl">
@@ -136,7 +137,7 @@
 
                                                         <div class="user-avatar report-item-avatar">
                                                             <a class="avatar" href="/user/350045" target="_blank">
-                                                                <img :src="userphoto(report.photo)">
+                                                                <img :src=this.user_photo>
                                                             </a>
 
                                                         </div>
@@ -212,6 +213,7 @@ export default {
             learn_list: [],
             token: '',
             reportlist: [],
+            user_photo:'',
         }
     },
     beforeMount() {
@@ -223,6 +225,7 @@ export default {
         this.get_course_info()
         this.get_lean_msg()
         this.token = localStorage.getItem('token')
+        this.user_photo = localStorage.getItem('img')
         this.get_comments()
     },
     methods: {
@@ -231,30 +234,30 @@ export default {
             if (photo === '1.jpg') {
                 return config['uploadurl'] + photo
             } else {
-                return config['qiniuurl'] + photo
+                return localStorage.getItem('img')
             }
         },
         collect_click(id) {
             this.$Message(id)
         },
         // 加载实验评论
-        get_comments() {
-            console.log('加载实验评论')
-            var params = { type: 'comment', cid: this.id }
-            get_questions_get(params).then(resp => {
-                console.log(resp.data)
-                this.ques_id = resp.data[0].id
-                var params2 = { ques_id: resp.data[0].id }
-                // 已登录展示收藏情况
-                var token = localStorage.getItem('token')
-                if (token)
-                    params2.token = token
-                console.log(params2)
-                get_comments_get(params2).then(resp => {
-                    this.comment_list = resp.data
-                })
-            })
-        },
+        // get_comments() {
+        //     console.log('加载实验评论')
+        //     var params = { type: 'comment', cid: this.id }
+        //     get_questions_get(params).then(resp => {
+        //         console.log(resp.data)
+        //         this.ques_id = resp.data[0].id
+        //         var params2 = { ques_id: resp.data[0].id }
+        //         // 已登录展示收藏情况
+        //         var token = localStorage.getItem('token')
+        //         if (token)
+        //             params2.token = token
+        //         console.log(params2)
+        //         get_comments_get(params2).then(resp => {
+        //             this.comment_list = resp.data
+        //         })
+        //     })
+        // },
 
         // 切换分类
         change_type() {
@@ -269,29 +272,25 @@ export default {
         // 获取课程信息
         get_course_info() {
             let cid = this.$route.query.id;
-            // console.log(cid);
-
-            // let cid = 3;
             var token = { token: localStorage.getItem('token') }
-            course_show_get({ cid: cid, token: token }).then(res => {
-                // console.log(res)
-                this.course_list = res.course_ser;
-                this.section_list = res.section_ser;
+            console.log('token', token)
+            course_show_get({ cid: cid, Authorization: token }).then(res => {
+                this.course_list = res.data.c_data;
+                this.section_list = res.data.s_data;
             })
         },
         // 获取学习状态
-        get_lean_msg() {
-            let token = localStorage.getItem('token');
-            let cid = this.$route.query.id
-            if (token) {
-                user_lean_get({ token: token, cid: cid }).then(res => {
-
-                    for (var i = 0; i < res.data.length; i++) {
-                        this.learn_list.push(res.data[i].sid)
-                    }
-                })
-            }
-        }
+        // get_lean_msg() {
+        //     let token = localStorage.getItem('token');
+        //     let cid = this.$route.query.id
+        //     if (token) {
+        //         user_lean_get({ token: token, cid: cid }).then(res => {
+        //             for (var i = 0; i < res.data.length; i++) {
+        //                 this.learn_list.push(res.data[i].sid)
+        //             }
+        //         })
+        //     }
+        // }
 
 
     },
